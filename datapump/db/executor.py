@@ -4,8 +4,10 @@ from contextlib import contextmanager
 from uuid import uuid4
 from typing import Any, Dict, Iterator
 
+import oracledb
 import psycopg2
 import pyodbc
+import pymysql
 
 
 class DatabaseExecutor:
@@ -23,6 +25,16 @@ class DatabaseExecutor:
             return
         if adapter in {"sqlserver", "mssql"}:
             with self._sqlserver_cursor() as cursor:
+                cursor.execute(sql)
+                yield cursor
+            return
+        if adapter == "mysql":
+            with self._mysql_cursor() as cursor:
+                cursor.execute(sql)
+                yield cursor
+            return
+        if adapter == "oracle":
+            with self._oracle_cursor() as cursor:
                 cursor.execute(sql)
                 yield cursor
             return
@@ -63,6 +75,41 @@ class DatabaseExecutor:
             f"UID={user};PWD={password};TrustServerCertificate=yes;"
         )
         conn = pyodbc.connect(conn_str)
+        try:
+            cursor = conn.cursor()
+            cursor.arraysize = self.fetch_size
+            yield cursor
+        finally:
+            conn.close()
+
+    @contextmanager
+    def _mysql_cursor(self) -> Iterator[Any]:
+        conn = pymysql.connect(
+            host=self.profile.get("host"),
+            user=self.profile.get("user"),
+            password=self.profile.get("password"),
+            database=self.profile.get("dbname") or self.profile.get("database"),
+            port=self.profile.get("port", 3306),
+            cursorclass=pymysql.cursors.Cursor,
+        )
+        try:
+            cursor = conn.cursor()
+            cursor.arraysize = self.fetch_size
+            yield cursor
+        finally:
+            conn.close()
+
+    @contextmanager
+    def _oracle_cursor(self) -> Iterator[Any]:
+        host = self.profile.get("host")
+        port = self.profile.get("port", 1521)
+        service_name = self.profile.get("service_name") or self.profile.get("database")
+        dsn = oracledb.makedsn(host, port, service_name=service_name)
+        conn = oracledb.connect(
+            user=self.profile.get("user"),
+            password=self.profile.get("password"),
+            dsn=dsn,
+        )
         try:
             cursor = conn.cursor()
             cursor.arraysize = self.fetch_size

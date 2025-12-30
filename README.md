@@ -9,6 +9,8 @@
 - Database drivers
   - Postgres: `psycopg2-binary`
   - SQL Server: an installed ODBC driver (default: `ODBC Driver 18 for SQL Server`)
+  - MySQL: `PyMySQL`
+  - Oracle: `oracledb` client libraries (Instant Client if needed)
 
 ## Installation
 
@@ -26,6 +28,7 @@ dbt compile
 datapump run \
   --select my_model,other_model \
   --output-dir target/datapump \
+  --gzip \
   --s3-bucket my-bucket \
   --s3-prefix exports/
 ```
@@ -41,7 +44,7 @@ datapump run \
 ## How it works
 
 1. `datapump run` reads `target/manifest.json` and collects compiled SQL for dbt models.
-2. It connects to your warehouse based on `profiles.yml` (Postgres or SQL Server).
+2. It connects to your warehouse based on `profiles.yml` (Postgres, SQL Server, MySQL, Oracle).
 3. Query results stream to CSV using cursor fetches (`--fetch-size`, default 10,000).
 4. Optional upload to S3 or Azure Blob.
 
@@ -53,6 +56,8 @@ datapump run \
 - `--target`: dbt target name (optional; defaults to profile target)
 - `--select`: Comma-separated model names to export (default: all compiled models)
 - `--output-dir`: Output directory for CSVs (default: `target/datapump`)
+- `--local`: Skip object storage uploads (keeps files locally only)
+- `--gzip`: Compress CSV outputs with gzip
 - `--s3-bucket` / `--s3-prefix`: Upload to S3
 - `--azure-container` / `--azure-connection-string`: Upload to Azure Blob
 - `--fetch-size`: Rows per fetch (default: 10000)
