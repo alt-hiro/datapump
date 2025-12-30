@@ -1,4 +1,5 @@
 import argparse
+import logging
 
 from datapump.commands.run import run
 
@@ -32,7 +33,24 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Azure Blob connection string",
     )
+    run_parser.add_argument(
+        "--storage",
+        choices=["aws_s3", "azure_blob", "local"],
+        default=None,
+        help="Explicit storage backend to use (aws_s3, azure_blob, local)",
+    )
+    run_parser.add_argument(
+        "--parallelism",
+        type=int,
+        default=1,
+        help="Number of models to export in parallel",
+    )
     run_parser.add_argument("--fetch-size", type=int, default=10000, help="Rows per fetch")
+    run_parser.add_argument(
+        "--verbose",
+        action="store_true",
+        help="Enable verbose logging output",
+    )
 
     return parser
 
@@ -42,6 +60,10 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.command == "run":
+        logging.basicConfig(
+            level=logging.DEBUG if args.verbose else logging.WARNING,
+            format="%(levelname)s:%(name)s:%(message)s",
+        )
         run(args)
 
 
