@@ -1,5 +1,7 @@
 # datapump
 
+![datapump logo](logo.svg)
+
 `datapump` runs dbt-compiled SQL and exports the results to CSV. It can optionally upload CSVs to Amazon S3 or Azure Blob Storage.
 
 ## Requirements
@@ -66,3 +68,7 @@ datapump run \
 
 - Run `dbt compile` before `datapump run`; it relies on compiled SQL in `target/manifest.json`.
 - For SQL Server, set `driver` in your profile if you use a different ODBC driver name.
+
+## License
+
+All rights reserved. See [LICENSE](LICENSE).

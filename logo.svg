@@ -1,0 +1,6 @@
+<svg width="320" height="120" viewBox="0 0 320 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="datapump logo">
+  <rect width="320" height="120" rx="18" fill="#0F172A"/>
+  <circle cx="60" cy="60" r="28" fill="#38BDF8"/>
+  <path d="M46 60h24M62 48l8 12-8 12" stroke="#0F172A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="108" y="68" font-family="'Segoe UI', 'Noto Sans JP', sans-serif" font-size="32" fill="#F8FAFC" font-weight="700">datapump</text>
+</svg>
