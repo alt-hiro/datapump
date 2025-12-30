@@ -42,3 +42,6 @@ def run_models(
     finally:
         executor.close()
     return output_paths
+
+  def run(_: argparse.Namespace) -> int:
+    return 0
